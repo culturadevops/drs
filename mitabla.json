@@ -1,0 +1,12 @@
+[
+ {
+  "id": "2",
+  "nombre": "mi segundo item",
+  "prueba2": "1"
+ },
+ {
+  "id": "1",
+  "nombre": "miprimer item",
+  "prueba": "0"
+ }
+]
