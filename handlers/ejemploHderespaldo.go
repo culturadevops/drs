@@ -1,3 +1,24 @@
+package handlers
+
+import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/culturadevops/drs/extra/appConfigs"
+	"github.com/culturadevops/drs/s3"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+var AppConfig appConfigs.Web
+
 type Ejemplo struct {
 }
 
@@ -15,59 +36,6 @@ func UploadMultipartformToS3(filename string, bucket string, RutaFinalEnS3 strin
 	s3.NewSession(Region)
 	RutaFinalEnS3 = RutaFinalEnS3 + filename
 	return s3.Upload(filename, bucket, RutaFinalEnS3, "text/plain")
-}
-func Post(url string, s3ruta string, tabla string) (string, string, string, string) {
-	client := &http.Client{}
-	fmt.Println("1")
-	//fmt.Println(url)
-	jsonBody := []byte(`{ "@type": "MessageCard","@context": "http://schema.org/extensions",
-	"themeColor": "0076D7","summary": "Archivo de respuesta",
-	"sections": [{"activityTitle": "dynamo scan", "activitySubtitle": "dev lima",
-	"activityImage": "https://teamsnodesample.azurewebsites.net/static/img/image5.png",
-	"facts": [{ "name": "tabla", "value": "` + tabla + `"},
-	{"name": "archivo","value": "` + s3ruta + `"}],
-	"markdown": true
-	}],"potentialAction": [
-	{ "@type": "OpenUri","name": "Learn More","targets": [{"os": "default","uri": "` + s3ruta + `"  }]}]}`)
-
-	bodyReader := bytes.NewReader(jsonBody)
-
-	req, err := http.NewRequest(http.MethodPost, url, bodyReader)
-	fmt.Println("4")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Println(err.Error())
-		fmt.Println("Errored when sending request to the server")
-
-	} else {
-		defer resp.Body.Close()
-		responseBody, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			log.Fatal(err)
-		}
-		type Build struct {
-			Name    string
-			Version string
-		}
-		type Objt struct {
-			Build Build
-		}
-		var jsonvars Objt
-
-		json.Unmarshal([]byte(string(responseBody)), &jsonvars)
-		if resp.Status == "200 OK" {
-			if responseBody != nil {
-				return resp.Status, "microname", jsonvars.Build.Name, jsonvars.Build.Version
-			} else {
-				return resp.Status, "", "", ""
-			}
-		}
-	}
-	return resp.Status, "microname", "", ""
 }
 
 func (t *Ejemplo) List() fiber.Handler {
@@ -110,9 +78,54 @@ func (t *Ejemplo) List() fiber.Handler {
 		s3 := new(s3.S3Client)
 		s3.NewSession(Region)
 		fmt.Println("------------------------")
-		s3rutalfinal := s3.GenerateUrlForDownload(buckets3, jsonfilename)
-
-		Post(AppConfig.Webhook, s3rutalfinal, tableName)
+		fmt.Println(s3.GenerateUrlForDownload(buckets3, jsonfilename))
 		return c.Status(http.StatusOK).JSON("ok")
 	}
 }
+
+/*
+func (t *Ejemplo) Add() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		u := new(ejemplorqt)
+		err := c.BodyParser(u)
+		data := ""
+		if err != nil {
+			// falta el agregar model
+			return c.Status(http.StatusInternalServerError).JSON(err)
+		}
+		return c.Status(http.StatusOK).JSON(data)
+	}
+}
+
+func (t *Ejemplo) List() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		//data := models.Ejemplo.List()
+		return c.Status(http.StatusOK).JSON(data)
+	}
+}
+func (t *Ejemplo) Show() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		//id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+		//data, _ := models.Ejemplo.Info(uint(id))
+		return c.Status(http.StatusOK).JSON(data)
+	}
+}
+func (t *Ejemplo) Del() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		//id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+		//data, _ := models.Ejemplo.Del(uint(id))
+		return c.Status(http.StatusOK).JSON(data)
+	}
+}
+func (t *Ejemplo) Update() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		//id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+		u := new(ejemplorqt)
+		if err := c.BodyParser(r); err != nil {
+			return err
+		}
+		//models.Ejemplo.Update(uint(id),u)
+		return c.Status(http.StatusOK).JSON("Registro actualizado")
+
+	}
+}*/
