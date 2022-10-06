@@ -1,5 +1,0 @@
-[default]
-bucket = "lima-aws-cicd-pipeline"
-region = "us-east-1"
-port = ":8080"
-webhook =""asdasd
