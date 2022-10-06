@@ -7,7 +7,7 @@ import (
 )
 
 func Ejemplo(e *fiber.App, Handler *handlers.Ejemplo) {
-	r := e.Group("/ejemplo")
+	r := e.Group("/support-lima-dynamo")
 	r.Get("/list/:tabla", Handler.List())
 
 	/*r.Get("/show/:id", Handler.Show())
