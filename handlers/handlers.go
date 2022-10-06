@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -55,7 +56,8 @@ func ReponseSuccess(c interface{}, data interface{}) error {
 func ReponseSuccesswithMessage(c interface{}, message string, data interface{}) error {
 	return Response(c, http.StatusOK, ReponseBasic(message, data))
 }
-func ResponseTradicional(c interface{}, err error, data interface{}) error {
+func TraditionalResponse(c interface{}, err error, data interface{}, me string) error {
+	fmt.Println(me)
 	if err != nil {
 		return ResponseInternalServerError(c, err.Error(), err)
 	} else {

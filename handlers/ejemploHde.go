@@ -37,6 +37,7 @@ func UploadMultipartformToS3(filename string, bucket string, RutaFinalEnS3 strin
 	RutaFinalEnS3 = RutaFinalEnS3 + filename
 	return s3.Upload(filename, bucket, RutaFinalEnS3, "text/plain")
 }
+
 func (t *Ejemplo) List() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		AppConfig.Configure("./configs", "app")
@@ -56,8 +57,7 @@ func (t *Ejemplo) List() fiber.Handler {
 		}
 		result, err := svc.Scan(params)
 		if err != nil {
-			log.Fatalf("Query API call failed: %s", err)
-			return c.Status(http.StatusInternalServerError).JSON(err)
+			return TraditionalResponse(c, err, nil, "error scan")
 		}
 		var SUPERMAP []map[string]string
 		for _, i := range result.Items {
@@ -65,15 +65,15 @@ func (t *Ejemplo) List() fiber.Handler {
 			err = dynamodbattribute.UnmarshalMap(i, &item)
 			if err != nil {
 				log.Fatalf("Got error unmarshalling: %s", err)
-				return c.Status(http.StatusInternalServerError).JSON("Got error unmarshalling")
+				return TraditionalResponse(c, err, nil, "Got error unmarshalling")
+
 			}
 			SUPERMAP = append(SUPERMAP, item)
 		}
 		jsonfilename := tableName + ".json"
 		writeFile(jsonfilename, SUPERMAP)
 		if UploadMultipartformToS3(jsonfilename, buckets3, "", Region) != nil {
-			log.Fatalf("s3 upload error: %s", err)
-			return c.Status(http.StatusInternalServerError).JSON("s3 upload error")
+			return TraditionalResponse(c, err, nil, "s3 upload error")
 		}
 		s3 := new(s3.S3Client)
 		s3.NewSession(Region)
