@@ -1,3 +1,25 @@
+package handlers
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/culturadevops/drs/extra/appConfigs"
+	"github.com/culturadevops/drs/s3"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+var AppConfig appConfigs.Web
+
 type Ejemplo struct {
 }
 
