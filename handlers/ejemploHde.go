@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -91,16 +92,26 @@ func Post(url string, s3ruta string, tabla string) (string, string, string, stri
 	}
 	return resp.Status, "microname", "", ""
 }
-
+func Getenv(key string) string {
+	value, defined := os.LookupEnv(key)
+	if !defined {
+		fmt.Println("falta variable de entorno" + key)
+		os.Exit(1)
+	}
+	return value
+}
 func (t *Ejemplo) List() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		AppConfig.Configure("./configs", "app")
+
 		//tableName := "mitabla"
 		//Region := "us-east-1"
 		//buckets3 := "lima-aws-cicd-pipeline"
-		Region := AppConfig.Region
-		buckets3 := AppConfig.Bucket
+		//Region := AppConfig.Region
+		//buckets3 := AppConfig.Bucket
+		Region := Getenv("REGION")
+		buckets3 := Getenv("BUCKET")
 		tableName := c.Params("tabla")
+		Webhook := Getenv("WEBHOOK")
 		sess := session.Must(session.NewSessionWithOptions(session.Options{
 			SharedConfigState: session.SharedConfigEnable,
 		}))
@@ -134,7 +145,7 @@ func (t *Ejemplo) List() fiber.Handler {
 		fmt.Println("------------------------")
 		s3rutalfinal := s3.GenerateUrlForDownload(buckets3, jsonfilename)
 
-		Post(AppConfig.Webhook, s3rutalfinal, tableName)
+		Post(Webhook, s3rutalfinal, tableName)
 		return c.Status(http.StatusOK).JSON("ok")
 	}
 }

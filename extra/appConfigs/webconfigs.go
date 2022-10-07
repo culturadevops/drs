@@ -9,10 +9,7 @@ import (
 )
 
 type Web struct {
-	Port    string
-	Bucket  string
-	Region  string
-	Webhook string
+	Port string
 }
 
 func (t *Web) Configure(ConfigPath string, ConfigName string) {
@@ -28,7 +25,5 @@ func (t *Web) Configure(ConfigPath string, ConfigName string) {
 	fmt.Println("config bucket")
 	fmt.Println(config.GetString("default.Bucket"))
 	t.Port = config.GetString("default.Port")
-	t.Bucket = config.GetString("default.Bucket")
-	t.Region = config.GetString("default.Region")
-	t.Webhook = config.GetString("default.Webhook")
+
 }
