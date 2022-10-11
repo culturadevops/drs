@@ -41,7 +41,7 @@ func UploadMultipartformToS3(filename string, bucket string, RutaFinalEnS3 strin
 }
 func Post(url string, s3ruta string, tabla string) (string, string, string, string) {
 	client := &http.Client{}
-	fmt.Println("1")
+
 	//fmt.Println(url)
 	jsonBody := []byte(`{ "@type": "MessageCard","@context": "http://schema.org/extensions",
 	"themeColor": "0076D7","summary": "Archivo de respuesta",
@@ -56,7 +56,7 @@ func Post(url string, s3ruta string, tabla string) (string, string, string, stri
 	bodyReader := bytes.NewReader(jsonBody)
 
 	req, err := http.NewRequest(http.MethodPost, url, bodyReader)
-	fmt.Println("4")
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -124,9 +124,9 @@ func (t *Ejemplo) List() fiber.Handler {
 		if err != nil {
 			return TraditionalResponse(c, err, nil, "error scan")
 		}
-		var SUPERMAP []map[string]string
+		var SUPERMAP []map[string]interface{}
 		for _, i := range result.Items {
-			var item map[string]string
+			var item map[string]interface{}
 			err = dynamodbattribute.UnmarshalMap(i, &item)
 			if err != nil {
 				log.Fatalf("Got error unmarshalling: %s", err)
